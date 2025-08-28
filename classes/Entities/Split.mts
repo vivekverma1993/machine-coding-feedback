@@ -1,16 +1,16 @@
 import { User } from "./User.mts"; 
 
 class Split {
-    userId: string;
+    user: User;
     amount: number;
 
-    constructor(userId: string, amount: number) {
-        this.userId = userId;
+    constructor(user: User, amount: number) {
+        this.user = user;
         this.amount = amount;
     }
 
-    getUserId(): string {
-        return this.userId;
+    getUser(): User {
+        return this.user;
     }
 
     getAmount(): number {

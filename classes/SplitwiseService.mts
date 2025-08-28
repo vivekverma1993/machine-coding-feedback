@@ -1,29 +1,38 @@
 import type { SplitStrategy } from "../interfaces/SplitStrategy.mts";
 import { BalanceSheet } from "./BalanceSheet.mts";
-import { EqualSplitStrategy } from "./Entities/Strategies/EqualSplitStrategy.mjs";
+import { EqualSplitStrategy } from "./Entities/Strategies/EqualSplitStrategy.mts";
 import { User } from "./Entities/User.mts";
+import { Expense } from "./Expense.mts";
 
 
 class SplitwiseService {
-    users: User[] = [];
-    balanceSheet: BalanceSheet;
+    users: Map<string, User> = new Map();
+    balanceSheet: BalanceSheet = new BalanceSheet();
 
-    handleExpense(paidBy: string, amount: number, participants: User[], splitStrategy: SplitStrategy) {
-	    splitStrategy.addExpense(paidBy, amount, participants);
+    createUser(userId: string, name: string, email: string): User {
+        const user = new User(userId, name, email);
+        this.users.set(userId, user);
+        return user;
+    }
+
+    // in order to support other split strategie we need to take splitData which 
+    // will be a map like  Map<string, number>, also this will be optional
+    handleExpense(description: string, amount: number, paidBy: string, involvedUserIds: string[], strategy: SplitStrategy): void {
+        console.log(description);
+        const paidByUser = this.users.get(paidBy)!;
+        const involvedUsers = involvedUserIds.map(id => this.users.get(id)!);
+
+        const splits = strategy.calculateSplits(involvedUsers, amount);
+        const expense = new Expense(description, amount, paidByUser, splits);
+        // we can store this expenses somewhere later
+
+        this.balanceSheet.updateBalance(expense.getPaidBy(), expense.getSplits());
+    }
+
+    printBalances(): void {
+        this.balanceSheet.getBalance();
     }
 
 }
 
-function main(): void {
-    const user1 = new User('u1', 'u1', '');
-    const user2 = new User('u2', 'u2', '');
-    const user3 = new User('u3', 'u3', '');
-    const user4 = new User('u4', 'u4', '');
-
-    const amount = 1000;
-    const ss: SplitStrategy = new EqualSplitStrategy();
-    const paidBy = user1.getUserId();
-
-    const splitService = new SplitwiseService();
-    splitService.handleExpense(paidBy, amount, [user1, user2, user3, user4],ss);
-}
+export { SplitwiseService };

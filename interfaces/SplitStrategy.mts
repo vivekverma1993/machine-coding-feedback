@@ -1,5 +1,7 @@
-import type { User } from "../classes/Entities/User.mjs";
+import type { Split } from "../classes/Entities/Split.mjs";
+import type { User } from "../classes/Entities/User.mts";
 
 export interface SplitStrategy {
-    addExpense(paidBy: string, amount: number, users: User[]): void;
+    // added split data to take care of other strategies
+    calculateSplits(users: User[], amount: number, splitData?: Map<string, number>): Split[];
 }
